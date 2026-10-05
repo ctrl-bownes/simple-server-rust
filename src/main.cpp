@@ -92,28 +92,113 @@ bool install_rustserver()
 	return (true);
 }
 
-void linux_setup()
+enum {
+	INSTALL,
+	CREATE,
+	MANAGE,
+};
+
+bool launch_rustserver()
 {
-	std::cout << "OS: Linux" << std::endl;
-	
-	install_steamcmd();
-	install_rustserver();
+	// ask user for name
+	// seed, size etc
+	// tell them that they will still be ablt to change that later
+	// check that server with seame identity exist
+
+    std::string command =
+        "cd rust_server && "
+        "LD_LIBRARY_PATH=\"../steamcmd/linux64:$LD_LIBRARY_PATH\" "
+        "./RustDedicated "
+        "+server.identity \"my_server\" "
+        "+server.hostname \"My Test Server\" "
+        "+server.port 28015 "
+        "+server.level \"Procedural Map\" "
+        "+server.worldsize 1000 "
+        "+server.seed 1337 "
+        "+server.maxplayers 10";
+
+    if (std::system(command.c_str()) != 0)
+    {
+        std::cerr << "Failed to launch Rust server." << std::endl;
+        return false;
+    }
+
+    return true;
 }
 
+void server_manager()
+{
+	// ask user what server they want to address
+	// display every server
+	// 		once in a server
+	//		display all information 
+	//		ask user what they want to do (edit config, access directory, ...) go back
+}
+
+void linux_setup()
+{
+	int choice;
+	char *end;
+	long value;
+
+	std::cout 
+		<< "Setup"
+		<< "\n"
+		<< "-----"
+		<< "\n"
+		<< "\n" << "0 - Install steamcmd"
+		<< "\n" << "1 - Create a server"
+		<< "\n" << "2 - Manage Servers" 
+		<< "\n" << "3 - Exit" 
+		<< "\n"
+		<< "\n" << "choice: ";
+
+	
+	std::string input;
+	std::getline(std::cin, input);
+	
+	if (input.empty())
+		return;
+
+	value = std::strtol(input.c_str(), &end, 10);
+
+	choice = -1;
+	if (*end == '\0')
+		choice = static_cast<int>(value);
+
+	switch (choice)
+	{
+	case INSTALL:
+		install_steamcmd();
+		break;
+
+	case CREATE:
+		launch_rustserver();
+		break;
+	
+	case MANAGE:
+		server_manager();
+		break;
+	
+	default:
+		break;
+	}
+}
 
 int main(void) {
 	switch (get_os())
 	{
 		case OS::WINDOWS:
-			std::cerr << "Error: WINDOWS OS: is not supported yet" << std::endl;
+			// std::cerr << "Error: WINDOWS OS: is not supported yet" << std::endl;
 			break;
 
 		case OS::LINUX:
+			// std::cout << "OS: Linux" << std::endl;
 			linux_setup();
 			break;
 
 		case OS::MAC:
-			std::cerr << "Error: MAC OS: is not supported yet" << std::endl;
+			// std::cerr << "Error: MAC OS: is not supported yet" << std::endl;
 			break;
 
 		default:
