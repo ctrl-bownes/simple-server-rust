@@ -1,6 +1,7 @@
 steamcmd
 rust_server
 server_files
+bin
 select_version.bat
 start_server.bat
 update_oxide.bat
