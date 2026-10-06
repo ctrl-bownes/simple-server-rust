@@ -2,7 +2,9 @@ CXX = c++
 
 CXXFLAGS = -Wall -Wextra -Werror -g
 
-SRC = src/main.cpp
+SRC = 	src/main.cpp\
+		src/terminal.cpp\
+		src/tui.cpp
 
 LINUX_CXX = c++
 WINDOWS_CXX = x86_64-w64-mingw32-g++
