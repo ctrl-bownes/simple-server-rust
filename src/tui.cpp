@@ -87,10 +87,10 @@ void tui_draw_main_menu(int selected)
     }
 
     tui_move(16, 8);
-    std::cout << "↑ ↓  Navigate";
+    std::cout << "'↑' '↓'  Navigate";
 
     tui_move(17, 8);
-    std::cout << "Enter  Select     Q  Quit";
+    std::cout << "'Enter'  Select     'Q'  Quit";
 
     std::cout << std::flush;
 }
@@ -155,7 +155,7 @@ void tui_draw_create_server(
     }
 
     tui_move(16, 7);
-    std::cout << "↑ ↓  Navigate    Enter  Edit    Esc  Back";
+    std::cout << "'↑' '↓'  Navigate    'Enter'  Edit    'Esc'  Back";
 
     std::cout << std::flush;
 }

@@ -5,6 +5,7 @@
 #include <ostream>
 #include <termios.h>
 #include <unistd.h>
+#include <string>
 
 enum class OS
 {
@@ -86,7 +87,6 @@ bool install_steamcmd()
     }
 }
 
-
 bool install_rustserver()
 {
 	std::string command =
@@ -105,17 +105,6 @@ bool install_rustserver()
     }
 	return (true);
 }
-
-enum {
-	INSTALL,
-	CREATE,
-	MANAGE,
-};
-
-#include <iostream>
-#include <string>
-#include <termios.h>
-#include <unistd.h>
 
 bool get_server_name(std::string &server_name)
 {
@@ -235,6 +224,32 @@ bool initialize_server(std::string server_name, int world_size, int world_seed, 
 	return (true);
 }
 
+int next_selection(int selected)
+{
+    ++selected;
+
+    if (selected == 4)
+        selected = 5;
+
+    if (selected > 6)
+        selected = 0;
+
+    return selected;
+}
+
+int previous_selection(int selected)
+{
+    --selected;
+
+    if (selected == 4)
+        selected = 3;
+
+    if (selected < 0)
+        selected = 6;
+
+    return selected;
+}
+
 bool create_server()
 {
     std::string server_name = "default";
@@ -255,7 +270,13 @@ bool create_server()
         );
 
         KeyEvent key = terminal_read_key();
-
+        tui_draw_create_server(
+            selected,
+            server_name,
+            world_size,
+            seed,
+            max_players
+        );
         switch (key.key)
         {
             case Key::UP:
@@ -285,54 +306,50 @@ bool create_server()
                     std::cout << std::flush;
 
                     tui_input_string(server_name, 32);
+
                     if (server_name.empty())
                         server_name = "default";
+
+                    selected = next_selection(selected);
                 }
                 else if (selected == 1)
                 {
                     tui_move(8, 27 + numDigits(world_size));
                     tui_show_cursor();
-
                     std::cout << std::flush;
+
                     tui_input_int(world_size, 4);
+
                     if (world_size > 6000)
                         world_size = 6000;
                     else if (world_size < 1000)
                         world_size = 1000;
+
+                    selected = next_selection(selected);
                 }
                 else if (selected == 2)
                 {
                     tui_move(9, 27 + numDigits(seed));
                     tui_show_cursor();
-
                     std::cout << std::flush;
+
                     tui_input_int(seed, 10);
+
+                    selected = next_selection(selected);
                 }
                 else if (selected == 3)
                 {
                     tui_move(10, 27 + numDigits(max_players));
                     tui_show_cursor();
-
                     std::cout << std::flush;
+
                     tui_input_int(max_players, 4);
+
+                    selected = next_selection(selected);
                 }
                 else if (selected == 5)
                 {
-                    terminal_restore();
-                    tui_show_cursor();
-                    tui_clear();
-
-                    bool success = initialize_server(server_name, world_size, seed, max_players);
-
-
-                    std::cout << "\nPress Enter to return...";
-                    std::cin.get();
-
-                    terminal_raw_mode();
-                    tui_hide_cursor();
-                    if (!success)
-                        break;
-                    return true;
+                    // create
                 }
                 else if (selected == 6)
                 {
