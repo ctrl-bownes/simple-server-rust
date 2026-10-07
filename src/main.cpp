@@ -10,6 +10,8 @@
 #include "includes/terminal.hpp"
 #include "includes/create_server.hpp"
 
+#include <csignal>
+
 enum class OS
 {
 	WINDOWS,
@@ -140,15 +142,29 @@ void run_install()
     tui_hide_cursor();
 }
 
+volatile std::sig_atomic_t g_interrupted = 0;
+
+void handle_sigint(int)
+{
+   // g_interrupted = 1;
+}
+
 void linux_setup()
 {
+     struct sigaction action = {};
+
+     action.sa_handler = handle_sigint;
+     sigemptyset(&action.sa_mask);
+     action.sa_flags = 0;
+
+     sigaction(SIGINT, &action, nullptr);
+
     terminal_raw_mode();
     tui_hide_cursor();
 
     int selected = 0;
-    bool running = true;
 
-    while (running)
+    while (!g_interrupted)
     {
         tui_draw_main_menu(selected);
 
@@ -186,18 +202,17 @@ void linux_setup()
                         break;
 
                     case 4:
-                        running = false;
+                        g_interrupted = true;
                         break;
                 }
                 break;
 
-            case Key::CHAR:
-                if (key.character == 'q' || key.character == 'Q')
-                    running = false;
+            case Key::ESCAPE:
+                g_interrupted = true;
                 break;
 
             case Key::CTRL_C:
-                running = false;
+                g_interrupted = true;
                 break;
 
             default:
@@ -206,8 +221,8 @@ void linux_setup()
     }
 
     tui_show_cursor();
-    terminal_restore();
     tui_clear();
+    terminal_restore();
 }
 
 int main(void) {
@@ -230,5 +245,6 @@ int main(void) {
 			std::cerr << "Error: unrecognized OS" << std::endl;
 			break;
 	}
+
 	return (0);
 }

@@ -16,7 +16,7 @@ int numDigits(T number)
     return digits;
 }
 
-int next_selection(int selected)
+int next_selection(int &selected)
 {
     ++selected;
     if (selected == EMPTY)
@@ -24,7 +24,7 @@ int next_selection(int selected)
     return selected;
 }
 
-int previous_selection(int selected)
+int previous_selection(int &selected)
 {
     --selected;
     if (selected == EMPTY)

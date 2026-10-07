@@ -90,12 +90,8 @@ void tui_draw_main_menu(int selected)
         std::cout << items[i];
     }
 
-    tui_move(16, 8);
-    std::cout << "'↑' '↓'  Navigate";
-
-    tui_move(17, 8);
-    std::cout << "'Enter'  Select     'Q'  Quit";
-
+    tui_move(16, 7);
+    std::cout << "'↑' '↓'  Navigate    'Enter'  Edit    'Esc'  Back";
     std::cout << std::flush;
 }
 

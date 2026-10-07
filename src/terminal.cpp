@@ -1,7 +1,9 @@
 #include "includes/terminal.hpp"
 
 #include <termios.h>
+#include <cerrno>
 #include <unistd.h>
+#include <poll.h>
 
 static struct termios original_termios;
 
@@ -27,7 +29,13 @@ KeyEvent terminal_read_key()
 {
     char c;
 
-    if (read(STDIN_FILENO, &c, 1) != 1)
+
+    int result = read(STDIN_FILENO, &c, 1);
+
+    if (result < 0 && errno == EINTR)
+        return {Key::CTRL_C, 0};
+
+    if (result != 1)
         return {Key::NONE, 0};
 
     if (c == 3)
@@ -41,6 +49,15 @@ KeyEvent terminal_read_key()
 
     if (c == 27)
     {
+        struct pollfd pfd;
+        pfd.fd = STDIN_FILENO;
+        pfd.events = POLLIN;
+
+        int ready = poll(&pfd, 1, 50);
+
+        if (ready <= 0)
+            return {Key::ESCAPE, 0};
+
         char next;
 
         if (read(STDIN_FILENO, &next, 1) != 1)

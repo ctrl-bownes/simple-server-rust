@@ -49,7 +49,7 @@ bool initialize_server(const server_t &new_server)
     return true;
 }
 
-void edit_server_value(server_t &server, int selected)
+void edit_server_value(server_t &server, int &selected)
 {
     if (selected == IDENTITY)
     {

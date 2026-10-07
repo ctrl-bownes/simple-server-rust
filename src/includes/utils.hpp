@@ -32,8 +32,8 @@ typedef struct server_s
 }   server_t;
 
 template <class T> int numDigits(T number);
-int next_selection(int selected);
-int previous_selection(int selected);
+int next_selection(int &selected);
+int previous_selection(int &selected);
 void edit_value(std::string &value, int max_input, int offset_item_y, int &selected);
 void edit_value(int &value, int max_input, int offset_item_y, int &selected);
 
