@@ -97,33 +97,37 @@ void tui_draw_main_menu(int selected)
 
 void tui_draw_create_server(
     int selected,
-    const std::string &server_name,
+    const std::string &identity,
+    const std::string &hostname,
+    const std::string &description,
     int world_size,
-    int world_seed,
-    int max_players
+    int seed,
+    int max_players,
+    int port
 )
 {
     tui_clear();
-
     tui_draw_box(1, 1, 62, 19);
-
     tui_move(3, 21);
     std::cout << "CREATE SERVER";
 
     const char *items[] =
     {
-        "Server name",
+        "Identity",
+        "Hostname",
+        "Description",
         "World size",
-        "World seed",
+        "Seed",
         "Max players",
+        "port",
         "",
         "Create Server",
         "Cancel"
     };
 
-    for (int i = 0; i < 7; ++i)
+    for (int i = 0; i < 10; ++i)
     {
-        tui_move(7 + i, 7);
+        tui_move(5 + i, 7);
 
         if (i == selected)
             std::cout << "> ";
@@ -132,24 +136,36 @@ void tui_draw_create_server(
 
         std::cout << items[i];
 
-        tui_move(7 + i, 27);
+        tui_move(5 + i, 27);
 
         switch (i)
         {
-            case 0:
-                std::cout << server_name;
+            case IDENTITY:
+                std::cout << identity;
                 break;
 
-            case 1:
+            case HOSTNAME:
+                std::cout << hostname;
+                break;
+
+            case DESCRIPTION:
+                std::cout << description;
+                break;
+
+            case WORLD_SIZE:
                 std::cout << world_size;
                 break;
 
-            case 2:
-                std::cout << world_seed;
+            case SEED:
+                std::cout << seed;
                 break;
 
-            case 3:
+            case MAX_PLAYERS:
                 std::cout << max_players;
+                break;
+
+            case PORT:
+                std::cout << port;
                 break;
         }
     }
