@@ -1,4 +1,10 @@
 #include "includes/create_server.hpp"
+#include "includes/terminal.hpp"
+#include "includes/tui.hpp"
+
+#include <iostream>
+#include <filesystem>
+#include <fstream>
 
 bool initialize_server(const server_t &server_cfg)
 {
@@ -12,6 +18,7 @@ bool initialize_server(const server_t &server_cfg)
     if (!std::filesystem::create_directories(server_path + "/cfg/"))
     {
         std::cerr << "Failed to create path '" + server_path + "/cfg/" << std::endl;
+        return (false);
     }
 
     std::ofstream file(server_path + "/cfg/server.cfg");
@@ -40,16 +47,7 @@ bool create_server()
 
     while (true)
     {
-        tui_draw_create_server(
-            selected,
-            new_server.identity,
-            new_server.hostname,
-            new_server.description,
-            new_server.world_size,
-            new_server.seed,
-            new_server.max_players,
-            new_server.port
-        );
+        tui_draw_create_server(selected, new_server);
 
         KeyEvent key = terminal_read_key();
         switch (key.key)

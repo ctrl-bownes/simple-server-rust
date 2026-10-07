@@ -1,4 +1,7 @@
 #include "includes/utils.hpp"
+#include "includes/tui.hpp"
+
+#include <iostream>
 
 template <class T>
 int numDigits(T number)

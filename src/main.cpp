@@ -6,6 +6,8 @@
 #include <termios.h>
 #include <unistd.h>
 #include <string>
+
+#include "includes/terminal.hpp"
 #include "includes/create_server.hpp"
 
 enum class OS

@@ -1,11 +1,23 @@
 #ifndef UTILS_HPP
 #define UTILS_HPP
 
-#include "tui.hpp"
-#include <iostream>
+#include <string>
 
 const int OFFSET_Y = 5;
 const int OFFSET_X = 27;
+
+enum {
+    EMPTY = 7,
+    IDENTITY = 0,
+    HOSTNAME = 1,
+    DESCRIPTION = 2,
+    WORLD_SIZE = 3,
+    SEED = 4,
+    MAX_PLAYERS = 5,
+    PORT = 6,
+    CREATE_SERVER = 8,
+    CANCEL = 9
+};
 
 typedef struct server_s
 {

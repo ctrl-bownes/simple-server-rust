@@ -1,6 +1,10 @@
 #include "includes/tui.hpp"
+#include "includes/utils.hpp"
+#include "includes/terminal.hpp"
 
 #include <iostream>
+#include <climits>
+#include <cstdlib>
 #include <unistd.h>
 
 void tui_clear()
@@ -95,16 +99,7 @@ void tui_draw_main_menu(int selected)
     std::cout << std::flush;
 }
 
-void tui_draw_create_server(
-    int selected,
-    const std::string &identity,
-    const std::string &hostname,
-    const std::string &description,
-    int world_size,
-    int seed,
-    int max_players,
-    int port
-)
+void tui_draw_create_server(int selected, const server_t &new_server)
 {
     tui_clear();
     tui_draw_box(1, 1, 62, 19);
@@ -141,31 +136,31 @@ void tui_draw_create_server(
         switch (i)
         {
             case IDENTITY:
-                std::cout << identity;
+                std::cout << new_server.identity;
                 break;
 
             case HOSTNAME:
-                std::cout << hostname;
+                std::cout << new_server.hostname;
                 break;
 
             case DESCRIPTION:
-                std::cout << description;
+                std::cout << new_server.description;
                 break;
 
             case WORLD_SIZE:
-                std::cout << world_size;
+                std::cout << new_server.world_size;
                 break;
 
             case SEED:
-                std::cout << seed;
+                std::cout << new_server.seed;
                 break;
 
             case MAX_PLAYERS:
-                std::cout << max_players;
+                std::cout << new_server.max_players;
                 break;
 
             case PORT:
-                std::cout << port;
+                std::cout << new_server.port;
                 break;
         }
     }
@@ -220,9 +215,6 @@ bool tui_input_string(std::string &value, std::size_t max_length)
         }
     }
 }
-
-#include <climits>
-#include <cstdlib>
 
 bool tui_input_int(int &value, std::size_t max_length)
 {
