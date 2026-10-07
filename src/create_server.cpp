@@ -1,17 +1,38 @@
 #include "includes/create_server.hpp"
 #include "includes/terminal.hpp"
 #include "includes/tui.hpp"
+#include "includes/utils.hpp"
 
 #include <iostream>
 #include <filesystem>
 #include <fstream>
 
-bool initialize_server(const server_t &server_cfg)
+bool create_new_server(const server_t &new_server, const std::string &server_path)
 {
-    const std::string server_path = "./rust_server/server/" + server_cfg.identity;
+    std::ofstream file(server_path + "/cfg/server.cfg");
+    if (!file)
+    {
+        std::cerr << "Failed to create server.cfg\n";
+        return (false);
+    }
+
+    file << "server.identity \"" << new_server.identity << "\"\n";
+    file << "server.hostname \"" << new_server.hostname << "\"\n";
+    file << "server.description \"" << new_server.description << "\"\n";
+    file << "server.worldsize " << new_server.world_size << "\n";
+    file << "server.seed " << new_server.seed << "\n";
+    file << "server.maxplayers " << new_server.max_players << "\n";
+    file << "server.port " << new_server.port << "\n";
+
+    return (true);
+}
+
+bool initialize_server(const server_t &new_server)
+{
+    const std::string server_path = "./rust_server/server/" + new_server.identity;
     if (std::filesystem::exists(server_path))
     {
-        std::cerr << "Server '" + server_cfg.identity + "' already exist." << std::endl;
+        std::cerr << "Server '" + new_server.identity + "' already exist." << std::endl;
         return (false);
     }
 
@@ -21,23 +42,62 @@ bool initialize_server(const server_t &server_cfg)
         return (false);
     }
 
-    std::ofstream file(server_path + "/cfg/server.cfg");
-    if (!file)
-    {
-        std::cerr << "Failed to create server.cfg\n";
+    if (!create_new_server(new_server, server_path))
         return (false);
+
+    std::cout << "Successfully created " + new_server.identity + " server.cfg.";
+    return true;
+}
+
+void edit_server_value(server_t &server, int selected)
+{
+    if (selected == IDENTITY)
+    {
+        edit_value(server.identity, 32, IDENTITY, selected);
+        if (server.identity.empty())
+            server.identity = "default";
+    }
+    else if (selected == HOSTNAME)
+        edit_value(server.hostname, 32, HOSTNAME, selected);
+
+    else if (selected == DESCRIPTION)
+        edit_value(server.description, 256, DESCRIPTION, selected);
+
+    else if (selected == WORLD_SIZE)
+    {
+        edit_value(server.world_size, 4, WORLD_SIZE, selected);
+
+        if (server.world_size > 6000)
+            server.world_size = 6000;
+        else if (server.world_size < 1000)
+            server.world_size = 1000;
     }
 
-    file << "server.identity \"" << server_cfg.identity << "\"\n";
-    file << "server.hostname \"" << server_cfg.hostname << "\"\n";
-    file << "server.description \"" << server_cfg.description << "\"\n";
-    file << "server.worldsize " << server_cfg.world_size << "\n";
-    file << "server.seed " << server_cfg.seed << "\n";
-    file << "server.maxplayers " << server_cfg.max_players << "\n";
-    file << "server.port " << server_cfg.port << "\n";
+    else if (selected == SEED)
+        edit_value(server.seed, 10, SEED, selected);
 
-    std::cout << "Successfully created " + server_cfg.identity + " server.cfg.";
-    return true;
+    else if (selected == MAX_PLAYERS)
+        edit_value(server.max_players, 4, MAX_PLAYERS, selected);
+
+    else if (selected == PORT)
+        edit_value(server.port, 5, PORT, selected);
+}
+
+bool create_server_action(const server_t &server)
+{
+    terminal_restore();
+    tui_show_cursor();
+    tui_clear();
+
+    bool success = initialize_server(server);
+
+    std::cout << "\nPress Enter to return...";
+    std::cin.get();
+
+    terminal_raw_mode();
+    tui_hide_cursor();
+
+    return success;
 }
 
 bool create_server()
@@ -64,57 +124,15 @@ bool create_server()
 
             case Key::ENTER:
             {
-                if (selected == IDENTITY)
+                if (selected == CREATE_SERVER)
                 {
-                    edit_value(new_server.identity, 32, IDENTITY, selected);
-                    if (new_server.identity.empty())
-                        new_server.identity = "default";
-                }
-
-                else if (selected == HOSTNAME)
-                    edit_value(new_server.hostname, 32, HOSTNAME, selected);
-
-                else if (selected == DESCRIPTION)
-                    edit_value(new_server.description, 256, DESCRIPTION, selected);
-
-                else if (selected == WORLD_SIZE)
-                {
-                    edit_value(new_server.world_size, 4, WORLD_SIZE, selected);
-                    if (new_server.world_size > 6000)
-                        new_server.world_size = 6000;
-                    else if (new_server.world_size < 1000)
-                        new_server.world_size = 1000;
-                }
-
-                else if (selected == SEED)
-                    edit_value(new_server.seed, 10, SEED, selected);
-
-                else if (selected == MAX_PLAYERS)
-                    edit_value(new_server.max_players, 4, MAX_PLAYERS, selected);
-
-                else if (selected == PORT)
-                    edit_value(new_server.port, 5, PORT, selected);
-
-                else if (selected == CREATE_SERVER)
-                {
-                    terminal_restore();
-                    tui_show_cursor();
-                    tui_clear();
-
-                    bool success = initialize_server(new_server);
-                    std::cout << "\nPress Enter to return...";
-                    std::cin.get();
-                    terminal_raw_mode();
-                    tui_hide_cursor();
-                    if (!success)
-                        break;
-                    return true;
+                    if (create_server_action(new_server))
+                        return true;
                 }
                 else if (selected == CANCEL)
-                {
                     return false;
-                }
-
+                else
+                    edit_server_value(new_server, selected);
                 break;
             }
 

@@ -8,6 +8,7 @@ const int OFFSET_X = 27;
 
 enum {
     EMPTY = 7,
+
     IDENTITY = 0,
     HOSTNAME = 1,
     DESCRIPTION = 2,
