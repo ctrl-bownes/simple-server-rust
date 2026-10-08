@@ -2,9 +2,13 @@
 #include "includes/utils.hpp"
 #include "includes/terminal.hpp"
 
+#include <cstddef>
+#include <cstring>
 #include <iostream>
 #include <climits>
 #include <cstdlib>
+#include <string>
+#include <sys/types.h>
 #include <unistd.h>
 
 void tui_clear()
@@ -15,6 +19,27 @@ void tui_clear()
 void tui_move(int row, int column)
 {
     std::cout << "\033[" << row << ";" << column << "H";
+}
+
+int tui_display_width(const std::string &str)
+{
+    int width = 0;
+
+    for (std::size_t i = 0; i < str.length(); ++i)
+    {
+        if ((str[i] & 0xC0) != 0x80)
+            ++width;
+    }
+
+    return width;
+}
+
+void tui_move_center_width(const std::string &str, int row)
+{
+    int width = tui_display_width(str);
+    int column = (WIDTH - width) / 2 + 1;
+
+    tui_move(row, column);
 }
 
 void tui_hide_cursor()
@@ -58,29 +83,48 @@ void tui_draw_box(
         std::cout << "─";
 
     std::cout << "╯";
+
+    std::string keys = "'↑' '↓'  Navigate    'Enter'  Edit    'Esc'  Back";
+    tui_move_center_width(keys, HEIGHT - 2);
+
+    std::cout << "\033[2m" << keys << "\033[0m";
 }
+
+#include <vector>
 
 void tui_draw_main_menu(int selected)
 {
+    std::vector<int> offset;
     tui_clear();
+    tui_draw_box(1, 1, WIDTH, HEIGHT);
 
-    tui_draw_box(1, 1, 62, 19);
-
-    tui_move(3, 17);
-    std::cout << "SIMPLE RUST SERVER MANAGER";
+    std::string str = "SIMPLE RUST SERVER MANAGER";
+    tui_move_center_width(str, 3);
+    std::cout << "\033[4m" << str << "\033[0m";
 
     const char *items[] =
     {
+        "Install steamCMD",
+        "Install/Update rust_server_files",
         "Manage Servers",
         "Create Server",
-        "Install / Update Rust",
         "Open Guide",
         "Exit"
     };
 
-    for (int i = 0; i < 5; ++i)
+    offset = {5, 8};
+    int n_space = 0;
+    for (int i = 0; i < static_cast<int>(sizeof(items)/sizeof(items[0])); ++i)
     {
-        tui_move(7 + i, 8);
+        int row = i + n_space;
+//
+        if (i == 2 || i == 5)
+        {
+            row++;
+            n_space++;
+        }
+
+        tui_move(row + offset[0], offset[1]);
 
         if (i == selected)
             std::cout << "> ";
@@ -89,18 +133,19 @@ void tui_draw_main_menu(int selected)
 
         std::cout << items[i];
     }
-
-    tui_move(16, 7);
-    std::cout << "'↑' '↓'  Navigate    'Enter'  Edit    'Esc'  Back";
     std::cout << std::flush;
+
 }
 
 void tui_draw_create_server(int selected, const server_t &new_server)
 {
     tui_clear();
-    tui_draw_box(1, 1, 62, 19);
+    tui_draw_box(1, 1, WIDTH, HEIGHT);
     tui_move(3, 21);
-    std::cout << "CREATE SERVER";
+    std::string title = "CREATE SERVER";
+    tui_move_center_width(title, 3);
+
+    std::cout << "\033[4m" << title << "\033[0m";
 
     const char *items[] =
     {
@@ -111,14 +156,21 @@ void tui_draw_create_server(int selected, const server_t &new_server)
         "Seed",
         "Max players",
         "port",
-        "",
         "Create Server",
         "Cancel"
     };
 
-    for (int i = 0; i < 10; ++i)
+    int n_space = 0;
+    for (int i = 0; i < static_cast<int>(sizeof(items)/sizeof(items[0])); ++i)
     {
-        tui_move(5 + i, 7);
+        int row = i + n_space;
+
+        if (i == 3 || i == 7)
+        {
+            row++;
+            n_space++;
+        }
+        tui_move(5 + row, 7);
 
         if (i == selected)
             std::cout << "> ";
@@ -127,7 +179,7 @@ void tui_draw_create_server(int selected, const server_t &new_server)
 
         std::cout << items[i];
 
-        tui_move(5 + i, 27);
+        tui_move(5 + row, 27);
 
         switch (i)
         {
@@ -160,9 +212,6 @@ void tui_draw_create_server(int selected, const server_t &new_server)
                 break;
         }
     }
-
-    tui_move(16, 7);
-    std::cout << "'↑' '↓'  Navigate    'Enter'  Edit    'Esc'  Back";
 
     std::cout << std::flush;
 }

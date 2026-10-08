@@ -16,20 +16,17 @@ int numDigits(T number)
     return digits;
 }
 
-int next_selection(int &selected)
+int server_menu_row(int &selected)
 {
-    ++selected;
-    if (selected == EMPTY)
-        ++selected;
-    return selected;
-}
+    int row = selected;
 
-int previous_selection(int &selected)
-{
-    --selected;
-    if (selected == EMPTY)
-        --selected;
-    return selected;
+    if (selected >= 3)
+        row++;
+
+    if (selected >= 7)
+        row++;
+
+    return row;
 }
 
 void edit_value(int &value, int max_input, int offset_item_y, int &selected)
@@ -38,7 +35,7 @@ void edit_value(int &value, int max_input, int offset_item_y, int &selected)
     tui_show_cursor();
     std::cout << std::flush;
     tui_input_int(value, max_input);
-    selected = next_selection(selected);
+    selected++;
 }
 
 void edit_value(std::string &value, int max_input, int offset_item_y, int &selected)
@@ -47,5 +44,5 @@ void edit_value(std::string &value, int max_input, int offset_item_y, int &selec
     tui_show_cursor();
     std::cout << std::flush;
     tui_input_string(value, max_input);
-    selected = next_selection(selected);
+    selected++;
 }

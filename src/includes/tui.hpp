@@ -4,6 +4,9 @@
 #include <string>
 #include "utils.hpp"
 
+#define WIDTH 60
+#define HEIGHT 24
+
 void tui_clear();
 void tui_move(int row, int column);
 void tui_hide_cursor();

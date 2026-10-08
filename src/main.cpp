@@ -2,13 +2,18 @@
 #include <cstring>
 #include <iostream>
 #include <filesystem>
+#include <iterator>
 #include <ostream>
 #include <termios.h>
+#include <type_traits>
 #include <unistd.h>
 #include <string>
 
 #include "includes/terminal.hpp"
 #include "includes/create_server.hpp"
+#include "includes/utils.hpp"
+#include "includes/tui.hpp"
+
 
 #include <csignal>
 
@@ -62,6 +67,12 @@ bool download_file(const std::string& url, const std::string& output)
 
 bool install_steamcmd()
 {
+    tui_clear();
+    tui_show_cursor();
+    terminal_restore();
+
+    std::cout << std::flush;
+
     char steamcmd_url[] =
 		"https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz";
 
@@ -111,7 +122,6 @@ bool install_rustserver()
 	return (true);
 }
 
-#include "includes/tui.hpp"
 
 void server_manager()
 {
@@ -124,7 +134,7 @@ void server_manager()
 
 #include "includes/tui.hpp"
 
-void run_install()
+void helper_terminal_restorer(bool (*function)(void))
 {
     tui_clear();
     tui_show_cursor();
@@ -132,8 +142,7 @@ void run_install()
 
     std::cout << std::flush;
 
-    install_steamcmd();
-    install_rustserver();
+    function();
 
     std::cout << "\nPress Enter to return...";
     std::cin.get();
@@ -142,22 +151,19 @@ void run_install()
     tui_hide_cursor();
 }
 
-volatile std::sig_atomic_t g_interrupted = 0;
-
-void handle_sigint(int)
+void handle_sigin(int)
 {
-   // g_interrupted = 1;
+
 }
 
 void linux_setup()
 {
-     struct sigaction action = {};
-
-     action.sa_handler = handle_sigint;
-     sigemptyset(&action.sa_mask);
-     action.sa_flags = 0;
-
-     sigaction(SIGINT, &action, nullptr);
+    int g_interrupted = 0;
+    struct sigaction action = {};
+    action.sa_handler = handle_sigin;
+    sigemptyset(&action.sa_mask);
+    action.sa_flags = 0;
+    sigaction(SIGINT, &action, nullptr);
 
     terminal_raw_mode();
     tui_hide_cursor();
@@ -174,34 +180,38 @@ void linux_setup()
         {
             case Key::UP:
                 if (selected > 0)
-                    --selected;
+                    selected--;
                 break;
 
             case Key::DOWN:
-                if (selected < 4)
-                    ++selected;
+                if (selected < 5)
+                    selected++;
                 break;
 
             case Key::ENTER:
                 switch (selected)
                 {
                     case 0:
-                        server_manager();
+                        helper_terminal_restorer(install_steamcmd);
                         break;
 
                     case 1:
-                        create_server();
+                        helper_terminal_restorer(install_rustserver);
                         break;
 
                     case 2:
-                        run_install();
+                        server_manager();
                         break;
 
                     case 3:
-                        // open guide
+                        create_server();
                         break;
 
                     case 4:
+                        // openguide();
+                        break;
+
+                    case 5:
                         g_interrupted = true;
                         break;
                 }

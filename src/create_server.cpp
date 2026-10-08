@@ -51,21 +51,23 @@ bool initialize_server(const server_t &new_server)
 
 void edit_server_value(server_t &server, int &selected)
 {
+    int row = server_menu_row(selected);
+
     if (selected == IDENTITY)
     {
-        edit_value(server.identity, 32, IDENTITY, selected);
+        edit_value(server.identity, 32, row, selected);
         if (server.identity.empty())
             server.identity = "default";
     }
     else if (selected == HOSTNAME)
-        edit_value(server.hostname, 32, HOSTNAME, selected);
+        edit_value(server.hostname, 32, row, selected);
 
     else if (selected == DESCRIPTION)
-        edit_value(server.description, 256, DESCRIPTION, selected);
+        edit_value(server.description, 256, row, selected);
 
     else if (selected == WORLD_SIZE)
     {
-        edit_value(server.world_size, 4, WORLD_SIZE, selected);
+        edit_value(server.world_size, 4, row, selected);
 
         if (server.world_size > 6000)
             server.world_size = 6000;
@@ -74,13 +76,13 @@ void edit_server_value(server_t &server, int &selected)
     }
 
     else if (selected == SEED)
-        edit_value(server.seed, 10, SEED, selected);
+        edit_value(server.seed, 10, row, selected);
 
     else if (selected == MAX_PLAYERS)
-        edit_value(server.max_players, 4, MAX_PLAYERS, selected);
+        edit_value(server.max_players, 4, row, selected);
 
     else if (selected == PORT)
-        edit_value(server.port, 5, PORT, selected);
+        edit_value(server.port, 5, row, selected);
 }
 
 bool create_server_action(const server_t &server)
@@ -114,12 +116,12 @@ bool create_server()
         {
             case Key::UP:
                 if (selected > 0)
-                    selected = previous_selection(selected);
+                    selected--;
                 break;
 
             case Key::DOWN:
-                if (selected < 9)
-                    selected = next_selection(selected);
+                if (selected < 8)
+                    selected++;
                 break;
 
             case Key::ENTER:

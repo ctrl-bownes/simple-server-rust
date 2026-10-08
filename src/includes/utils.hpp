@@ -7,17 +7,15 @@ const int OFFSET_Y = 5;
 const int OFFSET_X = 27;
 
 enum {
-    EMPTY = 7,
-
-    IDENTITY = 0,
-    HOSTNAME = 1,
-    DESCRIPTION = 2,
-    WORLD_SIZE = 3,
-    SEED = 4,
-    MAX_PLAYERS = 5,
-    PORT = 6,
-    CREATE_SERVER = 8,
-    CANCEL = 9
+    IDENTITY,
+    HOSTNAME,
+    DESCRIPTION,
+    WORLD_SIZE,
+    SEED,
+    MAX_PLAYERS,
+    PORT,
+    CREATE_SERVER,
+    CANCEL,
 };
 
 typedef struct server_s
@@ -32,8 +30,7 @@ typedef struct server_s
 }   server_t;
 
 template <class T> int numDigits(T number);
-int next_selection(int &selected);
-int previous_selection(int &selected);
+int server_menu_row(int &selected);
 void edit_value(std::string &value, int max_input, int offset_item_y, int &selected);
 void edit_value(int &value, int max_input, int offset_item_y, int &selected);
 
