@@ -2,16 +2,13 @@
 #include <cstring>
 #include <iostream>
 #include <filesystem>
-#include <iterator>
 #include <ostream>
 #include <termios.h>
-#include <type_traits>
 #include <unistd.h>
 #include <string>
 
 #include "includes/terminal.hpp"
 #include "includes/create_server.hpp"
-#include "includes/utils.hpp"
 #include "includes/tui.hpp"
 
 
